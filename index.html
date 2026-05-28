@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ML Job Intelligence Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            margin: 0;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #1f2937, #111827);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1300px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 14px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+
+        input {
+            width: 70%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-download {
+            background: #16a34a;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .box {
+            background: #f3f4f6;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        ul {
+            line-height: 2;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .danger {
+            color: red;
+            font-weight: bold;
+        }
+
+        .info-text {
+            line-height: 1.8;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- ================================================= -->
+<!-- HEADER -->
+<!-- ================================================= -->
+
+<div class="header">
+    <h1>ML Job Intelligence Dashboard</h1>
+    
+</div>
+
+<div class="container">
+
+    <!-- ================================================= -->
+    <!-- INPUT -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <form method="POST" action="/predict">
+
+            <input
+                type="text"
+                name="job"
+                placeholder="Enter job title..."
+                required
+            >
+
+            <button class="btn-primary">
+                Search
+            </button>
+
+        </form>
+
+    </div>
+
+    {% if result %}
+
+    <!-- ================================================= -->
+    <!-- PREDICTION RESULT -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Prediction Result</h2>
+
+        <div class="grid">
+
+            <div class="box">
+                <div class="title">Input</div>
+                <div class="value">{{ result.input }}</div>
+            </div>
+
+            <div class="box">
+                <div class="title">Best Match</div>
+                <div class="value">{{ result.best_match }}</div>
+            </div>
+
+            <div class="box">
+                <div class="title">Similarity</div>
+                <div class="value">{{ result.similarity }}</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- SALARY DASHBOARD -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Salary Dashboard</h2>
+
+        <div class="grid">
+
+            <div class="box">
+                <div class="title">Average Salary</div>
+                <div class="value">
+                    ${{ result.avg_salary }}
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="title">Median Salary</div>
+                <div class="value">
+                    ${{ result.median_salary }}
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="title">Job Count</div>
+                <div class="value">
+                    {{ result.count }}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- GLOBAL MARKET -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Global Market Overview</h2>
+
+        <div class="grid">
+
+            <div class="box">
+                <div class="title">Min Salary</div>
+                <div class="value">
+                    ${{ salary_dashboard.min }}
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="title">Max Salary</div>
+                <div class="value">
+                    ${{ salary_dashboard.max }}
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="title">Global Average</div>
+                <div class="value">
+                    ${{ salary_dashboard.global_avg }}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- MARKET LEVEL -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Market Intelligence</h2>
+
+        <div class="grid">
+
+            <div class="box">
+                <div class="title">Market Level</div>
+                <div class="value">
+                    {{ result.market_level }}
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="title">Work Mode</div>
+                <div class="value">
+                    {{ result.work_mode }}
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="title">AI Matching</div>
+                <div class="value">
+                    NLP Semantic Search
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- CHART -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Salary Distribution</h2>
+
+        <canvas id="salaryChart"></canvas>
+
+    </div>
+
+    <script>
+
+        const ctx = document.getElementById('salaryChart');
+
+        new Chart(ctx, {
+
+            type: 'bar',
+
+            data: {
+
+                labels: {{ job_names|tojson }},
+
+                datasets: [{
+
+                    label: 'Average Salary',
+
+                    data: {{ salary_distribution|tojson }},
+
+                    borderWidth: 1
+
+                }]
+            }
+        });
+
+    </script>
+
+    <!-- ================================================= -->
+    <!-- ANOMALY DETECTION -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Salary Anomaly Detection</h2>
+
+        <div class="grid">
+
+            <div class="box">
+
+                <div class="title">
+                    Detection Status
+                </div>
+
+                {% if result.anomaly == -1 %}
+
+                    <div class="danger">
+                        🔴 Anomaly Detected
+                    </div>
+
+                {% else %}
+
+                    <div class="success">
+                        🟢 Normal Market Job
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+            <div class="box">
+
+                <div class="title">
+                    Anomaly Score
+                </div>
+
+                <div class="value">
+                    {{ result.anomaly_score }}
+                </div>
+
+            </div>
+
+            <div class="box">
+
+                <div class="title">
+                    Risk Level
+                </div>
+
+                {% if result.anomaly == -1 %}
+
+                    <div class="danger">
+                        High Risk
+                    </div>
+
+                {% else %}
+
+                    <div class="success">
+                        Low Risk
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- AI INSIGHT -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>AI Insight</h2>
+
+        <div class="info-text">
+
+            {% if result.anomaly == -1 %}
+
+                <p>
+                    ⚠ This salary appears unusual compared to the market.
+                </p>
+
+                <p>
+                    Possible reasons:
+                    rare skills,
+                    international position,
+                    niche expertise,
+                    or outlier data.
+                </p>
+
+            {% else %}
+
+                <p>
+                    ✔ Salary is aligned with market standards.
+                </p>
+
+                <p>
+                    This job category appears stable and consistent.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- SKILLS -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Skills Recommendation</h2>
+
+        <div class="grid-2">
+
+            <div>
+
+                <h3>Hard Skills</h3>
+
+                <ul>
+
+                    {% for skill in hard_skills %}
+
+                        <li>{{ skill }}</li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+            <div>
+
+                <h3>Soft Skills</h3>
+
+                <ul>
+
+                    {% for skill in soft_skills %}
+
+                        <li>{{ skill }}</li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <!-- ================================================= -->
+    <!-- DOWNLOAD -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>⬇ Export Report</h2>
+
+        <a href="/download">
+
+            <button class="btn-download">
+                Download CSV Report
+            </button>
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Dataset
+*.csv
+*.xlsx
+
+# Models
+*.pkl
+*.joblib
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Power BI
+*.pbix
